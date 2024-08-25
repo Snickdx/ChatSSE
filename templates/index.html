@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Client</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.6.16/css/uikit.min.css" />
+    <script>
+        // document.addEventListener("DOMContentLoaded", function () {
+        //     const eventSource = new EventSource("/stream");
+        //     eventSource.onmessage = function (event) {
+        //         const messages = JSON.parse(event.data);
+        //         const chatBox = document.getElementById("chat-box");
+        //         if (Array.isArray(messages)) {
+        //             chatBox.innerHTML = "";
+        //             messages.forEach(msg => {
+        //                 const messageElement = document.createElement("div");
+        //                 messageElement.className = "uk-card uk-card-default uk-card-body uk-margin-small-bottom";
+        //                 messageElement.innerText = msg.username + ": " + msg.content + " (" + msg.timestamp + ")";
+        //                 chatBox.appendChild(messageElement);
+        //             });
+        //         } else {
+        //             const messageElement = document.createElement("div");
+        //             messageElement.className = "uk-card uk-card-default uk-card-body uk-margin-small-bottom";
+        //             messageElement.innerText = messages.username + ": " + messages.content + " (" + messages.timestamp + ")";
+        //             chatBox.appendChild(messageElement);
+        //         }
+        //     };
+        // });
+
+        async function sendMessage() {
+            const userId = document.getElementById('user-select').value;
+            const content = document.getElementById('message').value;
+            await fetch('/send_message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, content: content })
+            });
+            document.getElementById('message').value = "";
+        }
+    </script>
+</head>
+<body>
+
+<div class="uk-container uk-margin-top">
+    <h1 class="uk-heading-line">Chat Client</h1>
+    <select id="user-select" class="uk-select">
+        {% for user in users %}
+            <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select>
+
+    <div class="uk-margin">
+        <textarea id="message" class="uk-textarea" rows="4" placeholder="Type your message..."></textarea>
+    </div>
+    <button class="uk-button uk-button-primary" onclick="sendMessage()">Send</button>
+
+    <h2 class="uk-heading-line">Messages</h2>
+    <div id="chat-box" style="height: 300px; overflow-y: scroll; background-color: gainsboro">
+        {% for message in messages %}
+            <div style="margin: 5px; background-color: lightblue" class="uk-card uk-card-default uk-card-body uk-margin-small-bottom">
+                {{ message.user.username }}: {{ message.content }} ({{ message.timestamp }})
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.6.16/js/uikit.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.6.16/js/uikit-icons.min.js"></script>
+</body>
+</html>
